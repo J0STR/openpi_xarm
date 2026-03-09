@@ -353,7 +353,56 @@ class LeRobotLiberoDataConfig(DataConfigFactory):
             data_transforms=data_transforms,
             model_transforms=model_transforms,
         )
+import openpi.policies.xarm_policy as xarm_policy
+import numpy as np
 
+@dataclasses.dataclass(frozen=True)
+class LeRobotXArmDataConfig(DataConfigFactory):
+    action_sequence_keys: Sequence[str] = ("action",)
+    @override
+    def create(self, assets_dirs: pathlib.Path, model_config: _model.BaseModelConfig) -> DataConfig:
+        repack_transform = _transforms.Group(
+            inputs=[
+                _transforms.RepackTransform(
+                    {
+                        # Format: "target_key": "source_key_from_info_json"
+                        "observation.images.top_down": "observation.images.top_down",
+                        "observation.images.wrist_left": "observation.images.wrist_left",
+                        "observation.images.wrist_right": "observation.images.wrist_right",
+                        "observation.state": "observation.state",
+                        "actions": "action", # Note: 'action' is the key in your info.json
+                        "prompt": "prompt",
+                    }
+                )
+            ]
+        )
+
+        data_transforms = _transforms.Group(
+            inputs=[xarm_policy.XArmInputs(model_type=model_config.model_type)],
+            outputs=[xarm_policy.XArmOutputs()],
+        )
+
+        # Pi0 models perform best with delta actions for joints.
+        # Your joints are 0-6 (Right) and 8-14 (Left). Grippers are 7 and 15.
+        # We apply delta to joints but keep grippers absolute.
+        delta_mask = np.zeros(16, dtype=bool)
+        delta_mask[0:7] = True  # Right joints
+        delta_mask[8:15] = True # Left joints
+        
+        data_transforms = data_transforms.push(
+            inputs=[_transforms.DeltaActions(delta_mask)],
+            outputs=[_transforms.AbsoluteActions(delta_mask)],
+        )
+
+        model_transforms = ModelTransformFactory()(model_config)
+
+        return dataclasses.replace(
+            self.create_base_config(assets_dirs, model_config),
+            repack_transforms=repack_transform,
+            data_transforms=data_transforms,
+            model_transforms=model_transforms,
+            action_sequence_keys=self.action_sequence_keys,
+        )
 
 @dataclasses.dataclass(frozen=True)
 class RLDSDroidDataConfig(DataConfigFactory):
@@ -532,7 +581,7 @@ class TrainConfig:
     # device memory will be reduced but training could potentially be slower.
     # eg. if total device is 4 and fsdp devices is 2; then the model will shard to 2 devices and run
     # data parallel between 2 groups of devices.
-    fsdp_devices: int = 1
+    fsdp_devices: int = 3
 
     @property
     def assets_dirs(self) -> pathlib.Path:
@@ -558,6 +607,22 @@ class TrainConfig:
 
 # Use `get_config` if you need to get a config by name in your code.
 _CONFIGS = [
+    TrainConfig(
+        name="pi05_xarm_dual",
+        model=pi0_config.Pi0Config(
+            pi05=True,  
+            action_horizon=10 # Default for Pi0.5
+        ),
+        data=LeRobotXArmDataConfig(
+            repo_id="JoSTR/sort_rubics",
+            base_config=DataConfig(
+                prompt_from_task=True, # This enables LeRobot 3.0 task loading
+            ),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("/mnt/secondary/jonas_projects/openpi/checkpoints/pi05_xarm_dual/xarm_finetune_v1/3000/params"),
+        batch_size=30,
+        num_train_steps=20_000,
+    ),
     #
     # Inference Aloha configs.
     #

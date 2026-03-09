@@ -7,7 +7,7 @@ from typing import Literal, Protocol, SupportsIndex, TypeVar
 
 import jax
 import jax.numpy as jnp
-import lerobot.common.datasets.lerobot_dataset as lerobot_dataset
+import lerobot.datasets.lerobot_dataset as lerobot_dataset
 import numpy as np
 import torch
 
@@ -146,7 +146,17 @@ def create_torch_dataset(
     )
 
     if data_config.prompt_from_task:
-        dataset = TransformedDataset(dataset, [_transforms.PromptFromLeRobotTask(dataset_meta.tasks)])
+        task_mapping = {}
+        if dataset_meta.tasks is not None:
+            # Reach into the 'task_index' key and flip the {text: index} into {index: text}
+            inner_dict = dataset_meta.tasks.to_dict().get("task_index", {})
+            task_mapping = {int(index_val): str(text_key) for text_key, index_val in inner_dict.items()}
+        
+        # If the mapping is still empty, use a safe default
+        if not task_mapping:
+            print("Warning: No task mapping found in dataset metadata. PromptFromLeRobotTask will not be able to generate prompts.")
+
+        dataset = TransformedDataset(dataset, [_transforms.PromptFromLeRobotTask(task_mapping)])
 
     return dataset
 
