@@ -15,9 +15,15 @@ def _parse_image(image) -> np.ndarray:
 
 @dataclasses.dataclass(frozen=True)
 class XArmInputs(transforms.DataTransformFn):
-    model_type: _model.ModelType
+    # Do not change this for your own dataset.
+    action_dim: int
+
+    # Determines which model will be used.
+    # Do not change this for your own dataset.
+    model_type: _model.ModelType = _model.ModelType.PI05
 
     def __call__(self, data: dict) -> dict:
+        state = transforms.pad_to_dim(data["observation.state"], self.action_dim)
         # Mapping my 4 cameras to the 3 slots Pi0/Pi0.5 supports natively
         # Using 'top_down' as the main view
         base_image = _parse_image(data["observation.images.top_down"])
@@ -38,8 +44,9 @@ class XArmInputs(transforms.DataTransformFn):
             },
         }
 
-        if "actions" in data:
-            inputs["actions"] = data["actions"]
+        if "action" in data:
+            actions = transforms.pad_to_dim(data["action"], self.action_dim)
+            inputs["actions"] = actions
 
         if "prompt" in data:
             inputs["prompt"] = data["prompt"]
@@ -50,4 +57,4 @@ class XArmInputs(transforms.DataTransformFn):
 class XArmOutputs(transforms.DataTransformFn):
     def __call__(self, data: dict) -> dict:
         # My action dim is 16 (7 joints + 1 gripper per arm)
-        return {"actions": np.asarray(data["action"][:, :16])}
+        return {"actions": np.asarray(data["actions"][:, :16])}
