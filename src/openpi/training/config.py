@@ -612,13 +612,14 @@ _CONFIGS = [
         model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
 
         data=LeRobotXArmDataConfig(
-            repo_id="JoSTR/sort_rubics",
+            repo_id="JoSTR/sort_rubics_v2",
             base_config=DataConfig(
                 prompt_from_task=True, # This enables LeRobot 3.0 task loading
             ),
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),        
-        num_train_steps=5_000,
+        num_train_steps=20_000,
+        keep_period=1000,
     ),
     #
     # Inference Aloha configs.
