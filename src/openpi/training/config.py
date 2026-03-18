@@ -370,7 +370,7 @@ class LeRobotXArmDataConfig(DataConfigFactory):
                         "observation.images.wrist_left": "observation.images.wrist_left",
                         "observation.images.wrist_right": "observation.images.wrist_right",
                         "observation.state": "observation.state",
-                        "actions": "action", # Note: 'action' is the key in your info.json
+                        "action": "action",
                         "prompt": "prompt",
                     }
                 )
@@ -378,7 +378,7 @@ class LeRobotXArmDataConfig(DataConfigFactory):
         )
 
         data_transforms = _transforms.Group(
-            inputs=[xarm_policy.XArmInputs(model_type=model_config.model_type)],
+            inputs=[xarm_policy.XArmInputs(action_dim=model_config.action_dim,model_type=model_config.model_type)],
             outputs=[xarm_policy.XArmOutputs()],
         )
 
@@ -581,7 +581,7 @@ class TrainConfig:
     # device memory will be reduced but training could potentially be slower.
     # eg. if total device is 4 and fsdp devices is 2; then the model will shard to 2 devices and run
     # data parallel between 2 groups of devices.
-    fsdp_devices: int = 3
+    fsdp_devices: int = 1
 
     @property
     def assets_dirs(self) -> pathlib.Path:
@@ -609,19 +609,17 @@ class TrainConfig:
 _CONFIGS = [
     TrainConfig(
         name="pi05_xarm_dual",
-        model=pi0_config.Pi0Config(
-            pi05=True,  
-            action_horizon=10 # Default for Pi0.5
-        ),
+        model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
+
         data=LeRobotXArmDataConfig(
-            repo_id="JoSTR/sort_rubics",
+            repo_id="JoSTR/sort_rubics_v2",
             base_config=DataConfig(
                 prompt_from_task=True, # This enables LeRobot 3.0 task loading
             ),
         ),
-        weight_loader=weight_loaders.CheckpointWeightLoader("/mnt/secondary/jonas_projects/openpi/checkpoints/pi05_xarm_dual/xarm_finetune_v1/3000/params"),
-        batch_size=30,
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),        
         num_train_steps=20_000,
+        keep_period=1000,
     ),
     #
     # Inference Aloha configs.
