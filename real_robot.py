@@ -24,7 +24,7 @@ from lerobot_robot_dual_xarm7.lerobot_robot_dual_xarm7.config_dual_xarm7 import 
 
 # Configuration
 FPS = 30
-TASK_DESCRIPTION = "Grab the rubics cube and place it in the box"
+TASK_DESCRIPTION = "Grab the rubics cube and place it in the box."
 ACTIONS_TO_EXECUTE = 10  # Execute this many actions from each predicted chunk
 
 # Load Pi0 model
@@ -35,7 +35,7 @@ config = pi05_config.get_config("pi05_xarm_dual")
 
 # Use you trained policy HF directory
 # You should upload your model (assets and params directories from the checkpoint) to Hugging Face to use it here
-checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/pi05_h200_run_2")
+checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/sort_w_pushing_20k")
 pi0_policy = policy_config.create_trained_policy(config, checkpoint_dir)
 print("Pi0 model loaded successfully")
 
