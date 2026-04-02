@@ -1,6 +1,7 @@
 # Data directories.
 assets/
 checkpoints/
+checkpoints_torch/
 data/
 wandb/
 
