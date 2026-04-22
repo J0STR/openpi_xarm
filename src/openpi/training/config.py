@@ -612,6 +612,7 @@ _CONFIGS = [
         model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
 
         data=LeRobotXArmDataConfig(
+            #repo_id="JoSTR/temi_coop",
             repo_id="JoSTR/combined_dataset",
             base_config=DataConfig(
                 prompt_from_task=True, # This enables LeRobot 3.0 task loading
