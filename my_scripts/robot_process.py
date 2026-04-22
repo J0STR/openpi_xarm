@@ -190,9 +190,7 @@ def robot_loop_gui(stop_runtime: EventClass,
                 else:
                     # get new trajectory after
                     action_index = 100
-                    continue
-                    
-
+                    continue                 
 
             # handle pause button
             elif request_pausing_movement.is_set():

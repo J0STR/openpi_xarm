@@ -136,10 +136,10 @@
         },
         "images": {
             "normal_image": {
-                "path": "my_scripts/gui_code/assets/Record.png"
+                "path": "my_scripts/gui_code/assets_gui/Record.png"
             },
             "hovered_image": {
-                "path": "my_scripts/gui_code/assets/Record.png"
+                "path": "my_scripts/gui_code/assets_gui/Record.png"
             }
         }
     },
@@ -170,10 +170,10 @@
         },
         "images": {
             "normal_image": {
-                "path": "my_scripts/gui_code/assets/Recording.png"
+                "path": "my_scripts/gui_code/assets_gui/Recording.png"
             },
             "hovered_image": {
-                "path": "my_scripts/gui_code/assets/Recording.png"
+                "path": "my_scripts/gui_code/assets_gui/Recording.png"
             }
         }
     },
@@ -204,10 +204,10 @@
         },
         "images": {
             "normal_image": {
-                "path": "my_scripts/gui_code/assets/RobotStatus.png"
+                "path": "my_scripts/gui_code/assets_gui/RobotStatus.png"
             },
             "hovered_image": {
-                "path": "my_scripts/gui_code/assets/RobotStatus.png"
+                "path": "my_scripts/gui_code/assets_gui/RobotStatus.png"
             }
         }
     },
@@ -238,10 +238,10 @@
         },
         "images": {
             "normal_image": {
-                "path": "my_scripts/gui_code/assets/RobotStatus.png"
+                "path": "my_scripts/gui_code/assets_gui/RobotStatus.png"
             },
             "hovered_image": {
-                "path": "my_scripts/gui_code/assets/RobotStatus.png"
+                "path": "my_scripts/gui_code/assets_gui/RobotStatus.png"
             }
         }
     },
@@ -272,10 +272,10 @@
             },
             "images": {
                 "normal_image": {
-                    "path": "my_scripts/gui_code/assets/Play.png"
+                    "path": "my_scripts/gui_code/assets_gui/Play.png"
                 },
                 "hovered_image": {
-                    "path": "my_scripts/gui_code/assets/Play.png"
+                    "path": "my_scripts/gui_code/assets_gui/Play.png"
                 }
             }
         },
@@ -306,10 +306,10 @@
             },
             "images": {
                 "normal_image": {
-                    "path": "my_scripts/gui_code/assets/Pause.png"
+                    "path": "my_scripts/gui_code/assets_gui/Pause.png"
                 },
                 "hovered_image": {
-                    "path": "my_scripts/gui_code/assets/Pause.png"
+                    "path": "my_scripts/gui_code/assets_gui/Pause.png"
                 }
             }
         },
@@ -339,10 +339,10 @@
             },
             "images": {
                 "normal_image": {
-                    "path": "my_scripts/gui_code/assets/Manual.png"
+                    "path": "my_scripts/gui_code/assets_gui/Manual.png"
                 },
                 "hovered_image": {
-                    "path": "my_scripts/gui_code/assets/Manual.png"
+                    "path": "my_scripts/gui_code/assets_gui/Manual.png"
                 }
             }
         },
@@ -373,10 +373,10 @@
             },
             "images": {
                 "normal_image": {
-                    "path": "my_scripts/gui_code/assets/Manual.png"
+                    "path": "my_scripts/gui_code/assets_gui/Manual.png"
                 },
                 "hovered_image": {
-                    "path": "my_scripts/gui_code/assets/Manual.png"
+                    "path": "my_scripts/gui_code/assets_gui/Manual.png"
                 }
             }
         }

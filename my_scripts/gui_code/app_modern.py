@@ -23,7 +23,7 @@ class PyGameApp:
         self.GuiHandler = GuiHandler(self.width, self.height)
 
         script_dir = os.path.dirname(__file__)
-        img_path = os.path.join(script_dir, "assets/Background2.png")
+        img_path = os.path.join(script_dir, "assets_gui/Background2.png")
         background_original = pygame.image.load(img_path).convert()
         self.background = pygame.transform.smoothscale(background_original, (self.width, self.height))
         
