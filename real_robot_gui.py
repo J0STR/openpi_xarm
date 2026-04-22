@@ -23,6 +23,7 @@ if __name__ =="__main__":
                                                                      model_loaded,
                                                                      request_robot_reset,
                                                                      request_pausing_movement,
+                                                                     request_manual,
                                                                      obs_sender,
                                                                      output_receiver,
                                                                      ))

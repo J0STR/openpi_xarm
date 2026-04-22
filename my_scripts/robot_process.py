@@ -86,6 +86,7 @@ def robot_loop_gui(stop_runtime: EventClass,
                model_loaded: EventClass,
                request_reset: EventClass,
                request_pausing_movement: EventClass,
+               request_manual: EventClass,
                obs_sender: ConnectionClass,
                output_receiver:ConnectionClass,
                ):
@@ -104,6 +105,8 @@ def robot_loop_gui(stop_runtime: EventClass,
     dt = 1/30 # 30 Hz
     v_joints = np.pi/4 # 90 deg/s
     error_threshold = 0.01
+
+    manual_mode = False
 
     try:
         while not stop_runtime.is_set():
@@ -156,7 +159,40 @@ def robot_loop_gui(stop_runtime: EventClass,
 
                 # send
                 robot.send_action(action)
+                # get new trajectory after
                 action_index = 100
+
+            # handle manual
+            elif request_manual.is_set() or manual_mode:
+                
+                if not request_manual.is_set():
+                    manual_mode = False
+                    robot.robot_left.motion_enable(enable=True)
+                    robot.robot_left.set_mode(1)
+                    robot.robot_left.set_state(0)
+                    robot.robot_right.motion_enable(enable=True)
+                    robot.robot_right.set_mode(1)
+                    robot.robot_right.set_state(0)
+                elif manual_mode == False:
+                    manual_mode = True
+                    # activate manual mode
+                    robot.robot_left.motion_enable(enable=True)
+                    robot.robot_left.set_mode(0)
+                    robot.robot_left.set_state(0)
+                    robot.robot_left.set_mode(2)
+                    robot.robot_left.set_state(0)
+                    # ---
+                    robot.robot_right.motion_enable(enable=True)
+                    robot.robot_right.set_mode(0)
+                    robot.robot_right.set_state(0)
+                    robot.robot_right.set_mode(2)
+                    robot.robot_right.set_state(0)
+                else:
+                    # get new trajectory after
+                    action_index = 100
+                    continue
+                    
+
 
             # handle pause button
             elif request_pausing_movement.is_set():
