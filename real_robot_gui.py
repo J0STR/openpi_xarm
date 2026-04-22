@@ -2,7 +2,7 @@ import multiprocessing
 
 from my_scripts.robot_process import robot_loop_gui
 from my_scripts.model_process import model_loop_gui
-from my_scripts.gui_code.GUI import gui_loop
+from my_scripts.gui_code.gui_process import gui_loop
 
 
 if __name__ =="__main__":
