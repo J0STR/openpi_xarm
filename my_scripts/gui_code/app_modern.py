@@ -11,7 +11,7 @@ from .render_class_modern import GuiHandler
 class PyGameApp:
     def __init__(self, fullscreen= False,uses_multiprocess:bool=False):
         pygame.init()
-        self.width = 1920
+        self.width = 1080
         self.height = int(self.width*0.5625)
         app_name = "VLA-DuRoC"
 
@@ -33,6 +33,7 @@ class PyGameApp:
                 request_robot_reset: EventClass,
                 request_record: EventClass,
                 request_pausing_movement: EventClass,
+                request_manual: EventClass,
                 prompt_sender: ConnectionClass,
                 test_mode: bool=False): 
         clock = pygame.time.Clock()   
@@ -43,18 +44,13 @@ class PyGameApp:
 
             self.screen.blit(self.background, (0, 0))
 
-            self.GuiHandler.update_chat_box()
-            
-            # self.GuiHandler.update_robo_status(current_state_robo_1,
-            #                                    current_state_robo_2,
-            #                                    status_robo_1,
-            #                                    status_robo_2)
-        
+            self.GuiHandler.update_chat_box()        
 
             self.GuiHandler.input_management(prompt_sender,
                                              request_record,
                                              request_robot_reset,
-                                             request_pausing_movement)       
+                                             request_pausing_movement,
+                                             request_manual)       
             
             self.GuiHandler.manager.update(time_delta)
             self.GuiHandler.manager.draw_ui(self.screen)            

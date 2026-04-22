@@ -17,8 +17,8 @@ def model_loop(stop_runtime: EventClass,
     
     print('Loading Model...')
     config = pi05_config.get_config("pi05_xarm_dual")
-    checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/temi_pi05/10000")
-    #checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/big_data_20k_steps_pi05")
+    #checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/temi_pi05/5000")
+    checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/big_data_20k_steps_pi05")
     pi0_policy = policy_config.create_trained_policy(config, checkpoint_dir)
     model_loaded.set()
     print('Model Loaded')
@@ -57,6 +57,7 @@ def model_loop(stop_runtime: EventClass,
 
 def model_loop_gui(stop_runtime: EventClass,
                model_loaded: EventClass,
+               request_pause: EventClass,
                obs_receiver: ConnectionClass,
                prompt_receiver:ConnectionClass,
                output_sender: ConnectionClass,
@@ -65,6 +66,7 @@ def model_loop_gui(stop_runtime: EventClass,
     print('Loading Model...')
     config = pi05_config.get_config("pi05_xarm_dual")
     checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/big_data_20k_steps_pi05")
+    #checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/temi_pi05_v2/10000")
     pi0_policy = policy_config.create_trained_policy(config, checkpoint_dir)
     model_loaded.set()
     prompt = TASK_DESCRIPTION
@@ -74,13 +76,21 @@ def model_loop_gui(stop_runtime: EventClass,
     try:
         while not stop_runtime.is_set():
 
+            while observation is None:
+                if obs_receiver.poll(2.0):
+                    observation = obs_receiver.recv()
+                if stop_runtime.is_set():
+                    break
+
+            if observation is None:
+                break
+
             if prompt_receiver.poll():
                 # take latest prompt
                 while prompt_receiver.poll():
                     prompt = prompt_receiver.recv()
+            
 
-            if obs_receiver.poll(5.0):
-                observation = obs_receiver.recv()
             state_keys = [f"right_joint_{i+1}.pos" for i in range(7)] + ["right_gripper.pos"] + [f"left_joint_{i+1}.pos" for i in range(7)] + ["left_gripper.pos"]
             states = np.array([observation[key] for key in state_keys])
             
@@ -102,6 +112,8 @@ def model_loop_gui(stop_runtime: EventClass,
             output_sender.send(output)
             t_pred = time.perf_counter() - t_pred_start
             
+            # Reset Observation
+            observation = None
             # Keep track of last 10 prediction times
             pred_times.append(t_pred)
             pred_times = pred_times[-10:]  # Keep last 10

@@ -11,6 +11,8 @@ if __name__ =="__main__":
     request_sound_record = multiprocessing.Event()
     request_robot_reset = multiprocessing.Event()
     request_pausing_movement = multiprocessing.Event()
+    request_pausing_movement.set()
+    request_manual = multiprocessing.Event()
 
     obs_receiver, obs_sender = multiprocessing.Pipe()
     output_receiver, output_sender = multiprocessing.Pipe()
@@ -29,6 +31,7 @@ if __name__ =="__main__":
 
     process_model = multiprocessing.Process(target=model_loop_gui, args=(stop_runtime,
                                                                      model_loaded,
+                                                                     request_pausing_movement,
                                                                      obs_receiver,
                                                                      prompt_receiver,
                                                                      output_sender,
@@ -40,6 +43,7 @@ if __name__ =="__main__":
                                                                  request_sound_record,
                                                                 request_robot_reset,
                                                                 request_pausing_movement,
+                                                                request_manual,
                                                                 prompt_sender))
     process_gui.start()
     

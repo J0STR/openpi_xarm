@@ -178,13 +178,47 @@
         }
     },
 
-    "robot_status_button":
+    "reset_not_active_button":
     {   "colours":
         {
             "normal_bg": "#FCF8EE",
             "normal_text": "#000000",
             "hovered_bg": "#FFD560",
             "active_bg": "#FFD560"
+        },
+        "misc":
+        {
+            "shape": "rounded_rectangle",
+            "shape_corner_radius": "3",
+            "border_width": "1",
+            "shadow_width": "2",
+            "text_horiz_alignment": "center",
+            "auto_scale_images": "1"
+        },
+        "text_block": 
+        {
+            "misc": 
+            {
+                "word_wrap": "1"
+            }
+        },
+        "images": {
+            "normal_image": {
+                "path": "my_scripts/gui_code/assets/RobotStatus.png"
+            },
+            "hovered_image": {
+                "path": "my_scripts/gui_code/assets/RobotStatus.png"
+            }
+        }
+    },
+
+    "reset_active_button":
+    {   "colours":
+        {
+            "normal_bg": "#FFD560",
+            "normal_text": "#000000",
+            "hovered_bg": "#FFD560",
+            "active_bg": "#FCF8EE"
         },
         "misc":
         {
@@ -279,27 +313,72 @@
                 }
             }
         },
-
-    "robot_box":
-    {
-        "colours":
-        {      
-            "dark_bg": "#DFF3C7",
-            "link_text":"#F080E0,#8080E0,0",
-            "link_hover":"#FF8FEF",
-            "normal_text": "#000000",
-            "regular_text": "#D0D0D0,#FFFFFF,#D050FF,90"
+        "manual_inactive":
+        {   "colours":
+            {
+                "normal_bg": "#FCF8EE",
+                "normal_text": "#000000",
+                "hovered_bg": "#FFD560",
+                "active_bg": "#FFD560"
+            },
+            "misc":
+            {
+                "shape": "rounded_rectangle",
+                "shape_corner_radius": "3",
+                "border_width": "1",
+                "shadow_width": "2",
+                "text_horiz_alignment": "center",
+                "auto_scale_images": "1"
+            },
+            "text_block": 
+            {
+                "misc": 
+                {
+                    "word_wrap": "1"
+                }
+            },
+            "images": {
+                "normal_image": {
+                    "path": "my_scripts/gui_code/assets/Manual.png"
+                },
+                "hovered_image": {
+                    "path": "my_scripts/gui_code/assets/Manual.png"
+                }
+            }
         },
-        "misc":
-        {
-            "shape": "rounded_rectangle",
-            "shape_corner_radius": "3",
-            "border_width": "1",
-            "padding": "10,10",
-            "link_normal_underline": "0",
-            "link_hover_underline": "0",
-            "line_spacing": "0.9"
 
+    "manual_active":
+        {   "colours":
+            {
+                "normal_bg": "#FFD560",
+                "normal_text": "#000000",
+                "hovered_bg": "#FFD560",
+                "active_bg": "#FCF8EE"
+            },
+            "misc":
+            {
+                "shape": "rounded_rectangle",
+                "shape_corner_radius": "3",
+                "border_width": "1",
+                "shadow_width": "2",
+                "text_horiz_alignment": "center",
+                "auto_scale_images": "1"
+            },
+            "text_block": 
+            {
+                "misc": 
+                {
+                    "word_wrap": "1"
+                }
+            },
+            "images": {
+                "normal_image": {
+                    "path": "my_scripts/gui_code/assets/Manual.png"
+                },
+                "hovered_image": {
+                    "path": "my_scripts/gui_code/assets/Manual.png"
+                }
+            }
         }
-    }    
+   
 }
