@@ -61,12 +61,13 @@ def model_loop_gui(stop_runtime: EventClass,
                obs_receiver: ConnectionClass,
                prompt_receiver:ConnectionClass,
                output_sender: ConnectionClass,
+               model_config: str,
+               model_path: str
                ):
     
     print('Loading Model...')
-    config = pi05_config.get_config("pi05_xarm_dual")
-    checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/big_data_20k_steps_pi05")
-    #checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/temi_pi05_v2/10000")
+    config = pi05_config.get_config(model_config)
+    checkpoint_dir = download.maybe_download(model_path)
     pi0_policy = policy_config.create_trained_policy(config, checkpoint_dir)
     model_loaded.set()
     prompt = TASK_DESCRIPTION

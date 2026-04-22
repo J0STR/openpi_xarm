@@ -612,8 +612,21 @@ _CONFIGS = [
         model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
 
         data=LeRobotXArmDataConfig(
-            #repo_id="JoSTR/temi_coop",
             repo_id="JoSTR/combined_dataset",
+            base_config=DataConfig(
+                prompt_from_task=True, # This enables LeRobot 3.0 task loading
+            ),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),        
+        num_train_steps=20_000,
+        keep_period=1000,
+    ),
+    TrainConfig(
+        name="pi05_xarm_temi",
+        model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
+
+        data=LeRobotXArmDataConfig(
+            repo_id="JoSTR/temi_coop",
             base_config=DataConfig(
                 prompt_from_task=True, # This enables LeRobot 3.0 task loading
             ),
