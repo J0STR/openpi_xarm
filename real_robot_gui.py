@@ -1,7 +1,7 @@
 import multiprocessing
 
-from my_scripts.robot_process import robot_loop_gui
-from my_scripts.model_process import model_loop_gui
+from my_scripts.robot_process import robot_loop
+from my_scripts.model_process import model_loop
 from my_scripts.gui_code.gui_process import gui_loop
 
 
@@ -26,7 +26,7 @@ if __name__ =="__main__":
     prompt_receiver, prompt_sender = multiprocessing.Pipe()
 
 
-    process_robot = multiprocessing.Process(target=robot_loop_gui, args=(stop_runtime,
+    process_robot = multiprocessing.Process(target=robot_loop, args=(stop_runtime,
                                                                      model_loaded,
                                                                      request_robot_reset,
                                                                      request_pausing_movement,
@@ -37,7 +37,7 @@ if __name__ =="__main__":
     process_robot.start()
 
 
-    process_model = multiprocessing.Process(target=model_loop_gui, args=(stop_runtime,
+    process_model = multiprocessing.Process(target=model_loop, args=(stop_runtime,
                                                                      model_loaded,
                                                                      request_pausing_movement,
                                                                      obs_receiver,

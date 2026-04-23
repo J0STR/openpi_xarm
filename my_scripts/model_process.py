@@ -11,52 +11,6 @@ TASK_DESCRIPTION = "Do nothing"
 
 def model_loop(stop_runtime: EventClass,
                model_loaded: EventClass,
-               obs_receiver: ConnectionClass,
-               output_sender: ConnectionClass
-               ):
-    
-    print('Loading Model...')
-    config = pi05_config.get_config("pi05_xarm_dual")
-    #checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/temi_pi05/5000")
-    checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/big_data_20k_steps_pi05")
-    pi0_policy = policy_config.create_trained_policy(config, checkpoint_dir)
-    model_loaded.set()
-    print('Model Loaded')
-    pred_times = [] 
-    try:
-        while not stop_runtime.is_set():
-            observation = obs_receiver.recv()
-            state_keys = [f"right_joint_{i+1}.pos" for i in range(7)] + ["right_gripper.pos"] + [f"left_joint_{i+1}.pos" for i in range(7)] + ["left_gripper.pos"]
-            states = np.array([observation[key] for key in state_keys])
-
-            # Prepare input for Pi0
-            # Adjust for robot
-            pi0_input = {
-                "prompt": TASK_DESCRIPTION,
-                "observation.state": states,
-            }
-            
-            for k in ["top_down", "wrist_right", "wrist_left"]:
-                pi0_input[f"observation.images.{k}"] = observation[k]
-            
-            # Run inference
-            t_pred_start = time.perf_counter()
-            output = pi0_policy.infer(pi0_input)
-            output_sender.send(output)
-            t_pred = time.perf_counter() - t_pred_start
-            
-            # Keep track of last 10 prediction times
-            pred_times.append(t_pred)
-            pred_times = pred_times[-10:]  # Keep last 10
-
-            print(f"Prediction took {t_pred:.3f}s (avg over last {len(pred_times)}: {np.mean(pred_times):.3f}s)")
-
-    except KeyboardInterrupt:
-        print('Ended process Model')
-
-
-def model_loop_gui(stop_runtime: EventClass,
-               model_loaded: EventClass,
                request_pause: EventClass,
                obs_receiver: ConnectionClass,
                prompt_receiver:ConnectionClass,
