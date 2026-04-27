@@ -1,9 +1,6 @@
 import pygame
-import numpy as np
 from multiprocessing.synchronize import Event as EventClass
-from multiprocessing.sharedctypes import Synchronized, SynchronizedArray
 from multiprocessing.connection import Connection as ConnectionClass
-import multiprocessing
 import os
 
 from .render_class_modern import GuiHandler
@@ -11,7 +8,7 @@ from .render_class_modern import GuiHandler
 class PyGameApp:
     def __init__(self, fullscreen= False,uses_multiprocess:bool=False):
         pygame.init()
-        self.width = 1080
+        self.width = 1440
         self.height = int(self.width*0.5625)
         app_name = "VLA-DuRoC"
 

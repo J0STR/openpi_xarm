@@ -42,9 +42,11 @@ def robot_loop(stop_runtime: EventClass,
     action_index = 0
     output = None
 
-    dt = 1/30 # 30 Hz
-    v_joints = np.pi/4 # 90 deg/s
+    dt = 1/FPS # 50 Hz
+    v_joints_reset = np.pi/3 # 90 deg/s
     error_threshold = 0.01
+    error_policy = 0.1
+    v_joints_policy = np.pi/4
 
     manual_mode = False
 
@@ -66,10 +68,11 @@ def robot_loop(stop_runtime: EventClass,
                     robot.robot_left.motion_enable(enable=True)
                     robot.robot_left.set_mode(1)
                     robot.robot_left.set_state(0)
+                    robot.robot_left.set_gripper_enable(enable=True)
                 else:
                     delta_left = init_pose - joints_left
                     error_norm_left = np.linalg.norm(delta_left)
-                    delta_left = np.clip(delta_left,-v_joints*dt,v_joints*dt)
+                    delta_left = np.clip(delta_left,-v_joints_reset*dt,v_joints_reset*dt)
                     angles_left = joints_left + delta_left
                 # right robot
                 code_robo, [error_code_robo, warn_code]= robot.robot_right.get_err_warn_code()
@@ -77,10 +80,11 @@ def robot_loop(stop_runtime: EventClass,
                     robot.robot_right.motion_enable(enable=True)
                     robot.robot_right.set_mode(1)
                     robot.robot_right.set_state(0)
+                    robot.robot_right.set_gripper_enable(enable=True)
                 else:
                     delta_right = init_pose - joints_right
                     error_norm_right = np.linalg.norm(delta_right)
-                    delta_right = np.clip(delta_right,-v_joints*dt,v_joints*dt)
+                    delta_right = np.clip(delta_right,-v_joints_reset*dt,v_joints_reset*dt)
                     angles_right = joints_right + delta_right
                 action_left = np.hstack((angles_left,840))
                 action_right = np.hstack((angles_right,840))
@@ -138,22 +142,26 @@ def robot_loop(stop_runtime: EventClass,
             # handle policy
             elif last_actions is None or action_index >= min(ACTIONS_TO_EXECUTE, len(last_actions)):
                 output = None
-                observation = robot.get_observation()
-                
-                # send obs -->
-                obs_sender.send(observation)
-                # <-- receive model output
-                while output is None:
-                    if output_receiver.poll(timeout=2.0):
-                        output = output_receiver.recv()
-                    if stop_runtime.is_set():
-                        break
+                try:
+                    observation = robot.get_observation()
+                    
+                    # send obs -->
+                    obs_sender.send(observation)
+                    # <-- receive model output
+                    while output is None:
+                        if output_receiver.poll(timeout=2.0):
+                            output = output_receiver.recv()
+                        if stop_runtime.is_set():
+                            break
 
 
-                last_actions = output["actions"]
-                action_index = 0
+                    last_actions = output["actions"]
+                    action_index = 0
 
-                print(f"Step {step}: Predicted {len(last_actions)} actions, will execute {min(ACTIONS_TO_EXECUTE, len(last_actions))}")
+                    print(f"Step {step}: Predicted {len(last_actions)} actions, will execute {min(ACTIONS_TO_EXECUTE, len(last_actions))}")
+                except:
+                    print('Cam read erro')
+                    continue
             else:
                 # Get current action from the sequence
                 action = last_actions[action_index]
@@ -163,11 +171,40 @@ def robot_loop(stop_runtime: EventClass,
                 for i, action_name in enumerate(list(robot.action_features.keys())):
                     if i < len(action):
                         action_dict[action_name] = action[i]
+
+                # # current joints
+                code_left, [joints_left, velocity, effort] = robot.robot_left.get_joint_states(is_radian=True)
+                code_right, [joints_right, velocity, effort] = robot.robot_right.get_joint_states(is_radian=True)
+                # unwrap new joints
+                joints_new_right    = np.array([action_dict[f"right_joint_{i}.pos"] for i in range(1,8)])
+                joints_new_left     = np.array([action_dict[f"left_joint_{i}.pos"] for i in range(1,8)])
+                
+                delta_left = joints_new_left - joints_left
+                error_norm_left = np.linalg.norm(delta_left)
+                delta_left = np.clip(delta_left,-v_joints_policy*dt,v_joints_policy*dt)
+                angles_left = joints_left + delta_left
+                for i, angle in enumerate(angles_left): 
+                    action_dict[f"left_joint_{i+1}.pos"] = angle
+
+                delta_right = joints_new_right - joints_right
+                error_norm_right = np.linalg.norm(delta_right)
+                delta_right = np.clip(delta_right,-v_joints_policy*dt,v_joints_policy*dt)
+                angles_right = joints_right + delta_right
+                for i, angle in enumerate(angles_right): 
+                    action_dict[f"right_joint_{i+1}.pos"] = angle
+
+                if error_norm_left < error_policy and error_norm_right < error_policy and action_index<10:
+                    action_index += 1
+                    step += 1
+                elif error_norm_left < error_threshold and error_norm_right < error_threshold:
+                    action_index += 1
+                    step += 1
+                    
+
+                
                 
                 robot.send_action(action_dict)
-                action_index += 1
-                step += 1                   
-
+                                   
             precise_sleep(max(1.0 / FPS - (time.perf_counter() - t0), 0.0))
 
     except KeyboardInterrupt:

@@ -1,8 +1,6 @@
 from my_scripts.gui_code.app_modern import PyGameApp
 from multiprocessing.synchronize import Event as EventClass
-from multiprocessing.sharedctypes import Synchronized, SynchronizedArray
 from multiprocessing.connection import Connection as ConnectionClass
-import multiprocessing
 
 def gui_loop(stop_runtime: EventClass,
              request_record: EventClass,

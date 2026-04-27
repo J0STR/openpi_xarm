@@ -1,13 +1,10 @@
 import pygame
-import numpy as np
 from multiprocessing.synchronize import Event as EventClass
-from multiprocessing.sharedctypes import Synchronized, SynchronizedArray
 from multiprocessing.connection import Connection as ConnectionClass
-import multiprocessing
 import os
 
-from pygame_gui import UIManager, UI_TEXT_ENTRY_CHANGED, UI_BUTTON_PRESSED, UI_TEXT_ENTRY_FINISHED
-from pygame_gui.elements import  UITextEntryBox, UITextBox, UIImage, UIButton
+from pygame_gui import UIManager, UI_BUTTON_PRESSED
+from pygame_gui.elements import  UITextEntryBox, UITextBox, UIButton
 from pygame_gui.core import ObjectID
 
 class GuiHandler:
