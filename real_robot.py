@@ -6,17 +6,13 @@ os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.9"
 import time
 import numpy as np
 
-from lerobot.robots.lekiwi import LeKiwiClient, LeKiwiClientConfig
 from lerobot.utils.robot_utils import precise_sleep
 
 # Import Pi0 model from openpi
 from openpi.training import config as pi05_config
 from openpi.policies import policy_config
-from huggingface_hub import snapshot_download
-
-#my imports
 from openpi.shared import download
-from openpi.training import config as _config
+
 #from lerobot
 from lerobot.utils.import_utils import register_third_party_plugins
 from lerobot.robots import make_robot_from_config
@@ -24,7 +20,7 @@ from lerobot_robot_dual_xarm7.lerobot_robot_dual_xarm7.config_dual_xarm7 import 
 
 # Configuration
 FPS = 30
-TASK_DESCRIPTION = "Grab the rubics cube and place it in the box"
+TASK_DESCRIPTION = "Place the electrical screwdriver in the box"
 ACTIONS_TO_EXECUTE = 10  # Execute this many actions from each predicted chunk
 
 # Load Pi0 model
@@ -35,7 +31,7 @@ config = pi05_config.get_config("pi05_xarm_dual")
 
 # Use you trained policy HF directory
 # You should upload your model (assets and params directories from the checkpoint) to Hugging Face to use it here
-checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/pi05_h200_run_2")
+checkpoint_dir = download.maybe_download("/home/jonas/coding/openpi_xarm/checkpoints/big_data_10k_steps_pi05")
 pi0_policy = policy_config.create_trained_policy(config, checkpoint_dir)
 print("Pi0 model loaded successfully")
 
