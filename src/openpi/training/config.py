@@ -612,6 +612,21 @@ _CONFIGS = [
         model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
 
         data=LeRobotXArmDataConfig(
+            repo_id="JoSTR/combined_dataset",
+            base_config=DataConfig(
+                prompt_from_task=True, # This enables LeRobot 3.0 task loading
+            ),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("./checkpoints/pi05_xarm_dual/big_dataset/20000/params"),        
+        num_train_steps=20_000,
+        keep_period=5000,
+    ),
+
+    TrainConfig(
+        name="pi05_xarm_temi",
+        model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
+
+        data=LeRobotXArmDataConfig(
             repo_id="JoSTR/temi_coop",
             base_config=DataConfig(
                 prompt_from_task=True, # This enables LeRobot 3.0 task loading
@@ -619,6 +634,20 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("./checkpoints/pi05_xarm_dual/big_dataset/20000/params"),        
         num_train_steps=20_000,
+        keep_period=5000,
+    ),
+    TrainConfig(
+        name="pi05_xarm_ram",
+        model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
+
+        data=LeRobotXArmDataConfig(
+            repo_id="JoSTR/remove_ram",
+            base_config=DataConfig(
+                prompt_from_task=True, # This enables LeRobot 3.0 task loading
+            ),
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("./checkpoints/pi05_xarm_dual/ram_removal/5k/params"),        
+        num_train_steps=10_000,
         keep_period=5000,
     ),
     #

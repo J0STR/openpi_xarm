@@ -7,11 +7,11 @@ from my_scripts.gui_code.gui_process import gui_loop
 
 if __name__ =="__main__":
 
-    # model_path = "/home/jonas/coding/openpi_xarm/checkpoints/big_data_20k_steps_pi05"
-    # model_config="pi05_xarm_dual"
+    model_path = "/home/jonas/coding/openpi_xarm/checkpoints/big_data_20k_steps_pi05"
+    model_config="pi05_xarm_dual"
 
-    model_path ="/home/jonas/coding/openpi_xarm/checkpoints/temi_pi05_v2/10000"
-    model_config="pi05_xarm_temi"
+    # model_path ="/home/jonas/coding/openpi_xarm/checkpoints/temi_pi05_v2/10000"
+    # model_config="pi05_xarm_temi"
     
     stop_runtime = multiprocessing.Event()
     model_loaded = multiprocessing.Event()
