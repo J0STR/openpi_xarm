@@ -353,6 +353,11 @@ class LeRobotLiberoDataConfig(DataConfigFactory):
             data_transforms=data_transforms,
             model_transforms=model_transforms,
         )
+    
+
+### ------------------------------------ My Configs -------------------------------------------- ####
+### ------------------------ xArm ------------------------------------- ####
+
 import openpi.policies.xarm_policy as xarm_policy
 import numpy as np
 
@@ -392,6 +397,61 @@ class LeRobotXArmDataConfig(DataConfigFactory):
         data_transforms = data_transforms.push(
             inputs=[_transforms.DeltaActions(delta_mask)],
             outputs=[_transforms.AbsoluteActions(delta_mask)],
+        )
+
+        model_transforms = ModelTransformFactory()(model_config)
+
+        return dataclasses.replace(
+            self.create_base_config(assets_dirs, model_config),
+            repack_transforms=repack_transform,
+            data_transforms=data_transforms,
+            model_transforms=model_transforms,
+            action_sequence_keys=self.action_sequence_keys,
+        )
+    
+
+### ------------------------ Spot ------------------------------------- ####
+import openpi.policies.spot_policy as spot_policy
+@dataclasses.dataclass(frozen=True)
+class SpotDataConfig(DataConfigFactory):
+    action_sequence_keys: Sequence[str] = ("action",)
+    @override
+    def create(self, assets_dirs: pathlib.Path, model_config: _model.BaseModelConfig) -> DataConfig:
+        repack_transform = _transforms.Group(
+            inputs=[
+                _transforms.RepackTransform(
+                    {
+                        # Format: "target_key": "source_key_from_info_json"
+                        "observation.images.gripper": "observation.images.gripper_cam",
+                        "observation.images.front_left": "observation.images.front_left",
+                        "observation.images.front_right": "observation.images.front_right",
+                        "observation.state": "observation.state",
+                        "action": "action",
+                        "prompt": "prompt",
+                    }
+                )
+            ]
+        )
+
+        data_transforms = _transforms.Group(
+            inputs=[spot_policy.SpotInputs(action_dim=model_config.action_dim,model_type=model_config.model_type)],
+            outputs=[spot_policy.SpotOutputs()],
+        )
+
+        # Delta actions only for positions
+        # 0-2 (base velocities) and 3-8 (positions x/y/z) and 9-14 (positions joints). Gripper is  15 
+        # and rest is load which stays also absolute
+        # We apply delta to joints but keep grippers absolute.
+        delta_mask = np.zeros(23, dtype=bool)
+        delta_mask[3:9] = True  # Right joints
+        delta_mask[9:15] = True # Left joints
+
+        action_mask = np.zeros(10, dtype=bool)
+        action_mask[3:9] = True
+        
+        data_transforms = data_transforms.push(
+            inputs=[_transforms.DeltaActions(delta_mask)],
+            outputs=[_transforms.AbsoluteActions(action_mask)],
         )
 
         model_transforms = ModelTransformFactory()(model_config)
@@ -637,17 +697,17 @@ _CONFIGS = [
         keep_period=5000,
     ),
     TrainConfig(
-        name="pi05_xarm_ram",
+        name="pi05_spot",
         model=pi0_config.Pi0Config(pi05=True, action_horizon=15),
 
-        data=LeRobotXArmDataConfig(
-            repo_id="JoSTR/remove_ram",
+        data=SpotDataConfig(
+            repo_id="JoSTR/spot_e_screw",
             base_config=DataConfig(
                 prompt_from_task=True, # This enables LeRobot 3.0 task loading
             ),
         ),
-        weight_loader=weight_loaders.CheckpointWeightLoader("./checkpoints/pi05_xarm_dual/ram_removal/5k/params"),        
-        num_train_steps=10_000,
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),        
+        num_train_steps=20_000,
         keep_period=5000,
     ),
     #
